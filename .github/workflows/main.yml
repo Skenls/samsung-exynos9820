@@ -56,6 +56,10 @@ jobs:
             ccache-${{ env.TOOLCHAIN }}-${{ steps.ccache_model_key.outputs.KEY }}-
             ccache-${{ env.TOOLCHAIN }}-
 
+      - name: Setup KernelSU-Next
+        run: |
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s legacy
+
       - name: Kernel Configure
         run: |
           set -e -o pipefail
