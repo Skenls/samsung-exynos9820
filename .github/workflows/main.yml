@@ -64,9 +64,9 @@ jobs:
                        name="Cruel-devel"        \
                        toolchain=$TOOLCHAIN      \
                        -magisk                   \
-                       io_maple                  \
-                       performance               \
-                       noksm                     \
+                       +io_maple                 \
+                       +performance              \
+                       +noksm                    \
                        +nodebug                  \
                        +nohardening              \
                        +ttl                      \
