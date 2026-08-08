@@ -106,16 +106,16 @@ int asv_get_grp(unsigned int id)
 		grp = asv_tbl.int_asv_group + asv_tbl.int_modify_group;
 		break;
 	case dvfs_cpucl0:
-		grp = asv_tbl.littlecpu_asv_group + asv_tbl.littlecpu_modify_group;
+		grp = asv_tbl.littlecpu_asv_group + asv_tbl.littlecpu_modify_group + 2;
 		break;
 	case dvfs_cpucl1:
-		grp = asv_tbl.midcpu_asv_group + asv_tbl.midcpu_modify_group;
+		grp = asv_tbl.midcpu_asv_group + asv_tbl.midcpu_modify_group + 2;
 		break;
 	case dvfs_cpucl2:
-		grp = asv_tbl.bigcpu_asv_group + asv_tbl.bigcpu_modify_group;
+		grp = asv_tbl.bigcpu_asv_group + asv_tbl.bigcpu_modify_group + 2;
 		break;
 	case dvfs_g3d:
-		grp = asv_tbl.g3d_asv_group + asv_tbl.g3d_modify_group;
+		grp = asv_tbl.g3d_asv_group + asv_tbl.g3d_modify_group + 2;
 		break;
 	case dvfs_cam:
 	case dvfs_npu:
@@ -132,6 +132,9 @@ int asv_get_grp(unsigned int id)
 	default:
 		pr_info("Un-support asv grp %d\n", id);
 	}
+
+	if (grp > 15)
+		grp = 15;
 
 	return grp;
 }
