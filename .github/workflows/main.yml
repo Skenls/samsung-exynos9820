@@ -62,9 +62,9 @@ jobs:
           set -e -o pipefail
           ./cruelbuild config                    \
                        model=${{ matrix.model }} \
-                       name="Cruel-devel"        \
+                       name="Cruel-KRNL-fork"        \
                        toolchain=$TOOLCHAIN      \
-                       -magisk                   \
+                       +magisk=v30.7             \
                        +io_maple                 \
                        +performance              \
                        +noksm                    \
