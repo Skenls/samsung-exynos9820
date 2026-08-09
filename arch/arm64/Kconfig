@@ -1022,7 +1022,7 @@ config ARM64_VHE
 config SEC_ARM64_LSE_ATOMICS
 	bool "Use LSE atomic instructions"
 	default n
-	select ARM64_LSE_ATOMICS
+	
 	help
 	  Say Y here to make use of these instructions for the in-kernel
 	  atomic routines not dynamically but statically.
@@ -1041,7 +1041,7 @@ menu "ARMv8.2 architectural features"
 
 config ARM64_UAO
 	bool "Enable support for User Access Override (UAO)"
-	default y
+	default n
 	help
 	  User Access Override (UAO; part of the ARMv8.2 Extensions)
 	  causes the 'unprivileged' variant of the load/store instructions to

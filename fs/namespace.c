@@ -205,7 +205,7 @@ static inline void sys_umount_trace_print(struct mount *mnt, int flags)
 	int mnt_flags = mnt->mnt->mnt_flags;
 #else
 	struct super_block *sb = mnt->mnt.mnt_sb;
-	int mnt_flags = mnt->mnt.mnt_flags;
+	int mnt_flags = mnt->mnt_flags;
 #endif
 	/* We don`t want to see what zygote`s umount */
 	if (((sb->s_magic == SDFAT_SUPER_MAGIC) ||
@@ -569,7 +569,7 @@ int __mnt_want_write(struct vfsmount *m)
 #ifdef CONFIG_RKP_NS_PROT
 	while (ACCESS_ONCE(mnt->mnt->mnt_flags) & MNT_WRITE_HOLD)
 #else
-	while (ACCESS_ONCE(mnt->mnt.mnt_flags) & MNT_WRITE_HOLD)
+	while (ACCESS_ONCE(mnt->mnt_flags) & MNT_WRITE_HOLD)
 #endif
 		cpu_relax();
 	/*
@@ -775,7 +775,7 @@ static int mnt_make_readonly(struct mount *mnt)
 #ifdef CONFIG_RKP_NS_PROT
 	rkp_set_mnt_flags(mnt->mnt,MNT_WRITE_HOLD);
 #else
-	mnt->mnt.mnt_flags |= MNT_WRITE_HOLD;
+	mnt->mnt_flags |= MNT_WRITE_HOLD;
 #endif
 	/*
 	 * After storing MNT_WRITE_HOLD, we'll read the counters. This store
@@ -805,7 +805,7 @@ static int mnt_make_readonly(struct mount *mnt)
 #ifdef CONFIG_RKP_NS_PROT
 		rkp_set_mnt_flags(mnt->mnt,MNT_READONLY);
 #else
-		mnt->mnt.mnt_flags |= MNT_READONLY;
+		mnt->mnt_flags |= MNT_READONLY;
 #endif
 	}
 	/*
@@ -816,7 +816,7 @@ static int mnt_make_readonly(struct mount *mnt)
 #ifdef CONFIG_RKP_NS_PROT
 	rkp_reset_mnt_flags(mnt->mnt,MNT_WRITE_HOLD);
 #else
-	mnt->mnt.mnt_flags &= ~MNT_WRITE_HOLD;
+	mnt->mnt_flags &= ~MNT_WRITE_HOLD;
 #endif
 	unlock_mount_hash();
 	return ret;
@@ -828,7 +828,7 @@ static void __mnt_unmake_readonly(struct mount *mnt)
 #ifdef CONFIG_RKP_NS_PROT
 	rkp_reset_mnt_flags(mnt->mnt,MNT_READONLY);
 #else
-	mnt->mnt.mnt_flags &= ~MNT_READONLY;
+	mnt->mnt_flags &= ~MNT_READONLY;
 #endif
 	unlock_mount_hash();
 }
@@ -848,8 +848,8 @@ int sb_prepare_remount_readonly(struct super_block *sb)
 		if (!(mnt->mnt->mnt_flags & MNT_READONLY)) {
 			rkp_set_mnt_flags(mnt->mnt,MNT_WRITE_HOLD);
 #else
-		if (!(mnt->mnt.mnt_flags & MNT_READONLY)) {
-			mnt->mnt.mnt_flags |= MNT_WRITE_HOLD;
+		if (!(mnt->mnt_flags & MNT_READONLY)) {
+			mnt->mnt_flags |= MNT_WRITE_HOLD;
 #endif
 			smp_mb();
 			if (mnt_get_writers(mnt) > 0) {
@@ -870,8 +870,8 @@ int sb_prepare_remount_readonly(struct super_block *sb)
 		if (mnt->mnt->mnt_flags & MNT_WRITE_HOLD)
 			rkp_reset_mnt_flags(mnt->mnt,MNT_WRITE_HOLD);
 #else
-		if (mnt->mnt.mnt_flags & MNT_WRITE_HOLD)
-			mnt->mnt.mnt_flags &= ~MNT_WRITE_HOLD;
+		if (mnt->mnt_flags & MNT_WRITE_HOLD)
+			mnt->mnt_flags &= ~MNT_WRITE_HOLD;
 #endif
 	}
 	unlock_mount_hash();
@@ -1339,7 +1339,7 @@ vfs_kern_mount(struct file_system_type *type, int flags, const char *name, void 
 		rkp_set_mnt_flags(mnt->mnt,MNT_INTERNAL);
 	root = mount_fs(type, flags, name, mnt->mnt, data);
 #else
-		mnt->mnt.mnt_flags = MNT_INTERNAL;
+		mnt->mnt_flags = MNT_INTERNAL;
 	root = mount_fs(type, flags, name, &mnt->mnt, data);
 #endif
 
@@ -1449,29 +1449,29 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
 		nsflags |= MNT_LOCKED;
 	rkp_assign_mnt_flags(mnt->mnt,nsflags);
 #else
-	mnt->mnt.mnt_flags = old->mnt.mnt_flags;
-	mnt->mnt.mnt_flags &= ~(MNT_WRITE_HOLD|MNT_MARKED|MNT_INTERNAL);
+	mnt->mnt_flags = old->mnt.mnt_flags;
+	mnt->mnt_flags &= ~(MNT_WRITE_HOLD|MNT_MARKED|MNT_INTERNAL);
 	/* Don't allow unprivileged users to change mount flags */
 	if (flag & CL_UNPRIVILEGED) {
-		mnt->mnt.mnt_flags |= MNT_LOCK_ATIME;
+		mnt->mnt_flags |= MNT_LOCK_ATIME;
 
-		if (mnt->mnt.mnt_flags & MNT_READONLY)
-			mnt->mnt.mnt_flags |= MNT_LOCK_READONLY;
+		if (mnt->mnt_flags & MNT_READONLY)
+			mnt->mnt_flags |= MNT_LOCK_READONLY;
 
-		if (mnt->mnt.mnt_flags & MNT_NODEV)
-			mnt->mnt.mnt_flags |= MNT_LOCK_NODEV;
+		if (mnt->mnt_flags & MNT_NODEV)
+			mnt->mnt_flags |= MNT_LOCK_NODEV;
 
-		if (mnt->mnt.mnt_flags & MNT_NOSUID)
-			mnt->mnt.mnt_flags |= MNT_LOCK_NOSUID;
+		if (mnt->mnt_flags & MNT_NOSUID)
+			mnt->mnt_flags |= MNT_LOCK_NOSUID;
 
-		if (mnt->mnt.mnt_flags & MNT_NOEXEC)
-			mnt->mnt.mnt_flags |= MNT_LOCK_NOEXEC;
+		if (mnt->mnt_flags & MNT_NOEXEC)
+			mnt->mnt_flags |= MNT_LOCK_NOEXEC;
 	}
 
 	/* Don't allow unprivileged users to reveal what is under a mount */
 	if ((flag & CL_UNPRIVILEGED) &&
 	    (!(flag & CL_EXPIRE) || list_empty(&old->mnt_expire)))
-		mnt->mnt.mnt_flags |= MNT_LOCKED;
+		mnt->mnt_flags |= MNT_LOCKED;
 #endif
 	/* Don't allow unprivileged users to reveal what is under a mount */
 	atomic_inc(&sb->s_active);
@@ -1605,7 +1605,7 @@ static void mntput_no_expire(struct mount *mnt)
 #ifdef CONFIG_RKP_NS_PROT
 	if (unlikely(mnt->mnt->mnt_flags & MNT_DOOMED)) {
 #else
-	if (unlikely(mnt->mnt.mnt_flags & MNT_DOOMED)) {
+	if (unlikely(mnt->mnt_flags & MNT_DOOMED)) {
 #endif
 		rcu_read_unlock();
 		unlock_mount_hash();
@@ -1614,7 +1614,7 @@ static void mntput_no_expire(struct mount *mnt)
 #ifdef CONFIG_RKP_NS_PROT
 	rkp_set_mnt_flags(mnt->mnt,MNT_DOOMED);
 #else
-	mnt->mnt.mnt_flags |= MNT_DOOMED;
+	mnt->mnt_flags |= MNT_DOOMED;
 #endif
 	rcu_read_unlock();
 
@@ -1631,7 +1631,7 @@ static void mntput_no_expire(struct mount *mnt)
 #ifdef CONFIG_RKP_NS_PROT
 	if (likely(!(mnt->mnt->mnt_flags & MNT_INTERNAL))) {
 #else
-	if (likely(!(mnt->mnt.mnt_flags & MNT_INTERNAL))) {
+	if (likely(!(mnt->mnt_flags & MNT_INTERNAL))) {
 #endif
 		struct task_struct *task = current;
 		if (likely(!(task->flags & PF_KTHREAD))) {
@@ -2059,7 +2059,7 @@ static int do_umount(struct mount *mnt, int flags)
 #ifdef CONFIG_RKP_NS_PROT
 	if (mnt->mnt->mnt_flags & MNT_LOCKED)
 #else
-	if (mnt->mnt.mnt_flags & MNT_LOCKED)
+	if (mnt->mnt_flags & MNT_LOCKED)
 #endif
 		goto out;
 
@@ -2110,7 +2110,7 @@ void __detach_mounts(struct dentry *dentry)
 #ifdef CONFIG_RKP_NS_PROT
 		if (mnt->mnt->mnt_flags & MNT_UMOUNT) {
 #else
-		if (mnt->mnt.mnt_flags & MNT_UMOUNT) {
+		if (mnt->mnt_flags & MNT_UMOUNT) {
 #endif
 			hlist_add_head(&mnt->mnt_umount.s_list, &unmounted);
 			umount_mnt(mnt);
@@ -2184,7 +2184,7 @@ SYSCALL_DEFINE2(umount, char __user *, name, int, flags)
 #ifdef CONFIG_RKP_NS_PROT
 	if (mnt->mnt->mnt_flags & MNT_LOCKED)
 #else
-	if (mnt->mnt.mnt_flags & MNT_LOCKED) /* Check optimistically */
+	if (mnt->mnt_flags & MNT_LOCKED) /* Check optimistically */
 #endif
 		goto dput_and_out;
 	retval = -EPERM;
@@ -2242,6 +2242,36 @@ SYSCALL_DEFINE1(oldumount, char __user *, name)
 }
 
 #endif
+
+static int can_umount(const struct path *path, int flags)
+ {
+	 struct mount *mnt = real_mount(path->mnt);
+	 if (flags & ~(MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW))
+		 return -EINVAL;
+	 if (!may_mount())
+		 return -EPERM;
+	 if (path->dentry != path->mnt->mnt_root)
+		 return -EINVAL;
+	 if (!check_mnt(mnt))
+		 return -EINVAL;
+	 if (mnt->mnt.mnt_flags & MNT_LOCKED)
+		 return -EINVAL;
+	 if (flags & MNT_FORCE && !capable(CAP_SYS_ADMIN))
+		 return -EPERM;
+	 return 0;
+ }
+
+int path_umount(struct path *path, int flags)
+ {
+	 struct mount *mnt = real_mount(path->mnt);
+	 int ret;
+	 ret = can_umount(path, flags);
+	 if (!ret)
+		 ret = do_umount(mnt, flags);
+	 dput(path->dentry);
+	 mntput_no_expire(mnt);
+	 return ret;
+ }
 
 static bool is_mnt_ns_file(struct dentry *dentry)
 {
@@ -2807,7 +2837,7 @@ static int do_loopback(struct path *path, const char *old_name,
 #ifdef CONFIG_RKP_NS_PROT
 	rkp_reset_mnt_flags(mnt->mnt,MNT_LOCKED);
 #else
-	mnt->mnt.mnt_flags &= ~MNT_LOCKED;
+	mnt->mnt_flags &= ~MNT_LOCKED;
 #endif
 	err = graft_tree(mnt, parent, mp);
 	if (err) {
@@ -2885,24 +2915,24 @@ static int do_remount(struct path *path, int ms_flags, int sb_flags,
 		return -EPERM;
 	}
 #else
-	if ((mnt->mnt.mnt_flags & MNT_LOCK_READONLY) &&
+	if ((mnt->mnt_flags & MNT_LOCK_READONLY) &&
 	    !(mnt_flags & MNT_READONLY)) {
 		return -EPERM;
 	}
-	if ((mnt->mnt.mnt_flags & MNT_LOCK_NODEV) &&
+	if ((mnt->mnt_flags & MNT_LOCK_NODEV) &&
 	    !(mnt_flags & MNT_NODEV)) {
 		return -EPERM;
 	}
-	if ((mnt->mnt.mnt_flags & MNT_LOCK_NOSUID) &&
+	if ((mnt->mnt_flags & MNT_LOCK_NOSUID) &&
 	    !(mnt_flags & MNT_NOSUID)) {
 		return -EPERM;
 	}
-	if ((mnt->mnt.mnt_flags & MNT_LOCK_NOEXEC) &&
+	if ((mnt->mnt_flags & MNT_LOCK_NOEXEC) &&
 	    !(mnt_flags & MNT_NOEXEC)) {
 		return -EPERM;
 	}
-	if ((mnt->mnt.mnt_flags & MNT_LOCK_ATIME) &&
-	    ((mnt->mnt.mnt_flags & MNT_ATIME_MASK) != (mnt_flags & MNT_ATIME_MASK))) {
+	if ((mnt->mnt_flags & MNT_LOCK_ATIME) &&
+	    ((mnt->mnt_flags & MNT_ATIME_MASK) != (mnt_flags & MNT_ATIME_MASK))) {
 		return -EPERM;
 	}
 #endif
@@ -2929,8 +2959,8 @@ static int do_remount(struct path *path, int ms_flags, int sb_flags,
 		mnt_flags |= mnt->mnt->mnt_flags & ~MNT_USER_SETTABLE_MASK;
 		rkp_assign_mnt_flags(mnt->mnt,mnt_flags);
 #else
-		mnt_flags |= mnt->mnt.mnt_flags & ~MNT_USER_SETTABLE_MASK;
-		mnt->mnt.mnt_flags = mnt_flags;
+		mnt_flags |= mnt->mnt_flags & ~MNT_USER_SETTABLE_MASK;
+		mnt->mnt_flags = mnt_flags;
 #endif
 		touch_mnt_namespace(mnt->mnt_ns);
 		unlock_mount_hash();
@@ -3093,7 +3123,7 @@ static int do_add_mount(struct mount *newmnt, struct path *path, int mnt_flags)
 #ifdef CONFIG_RKP_NS_PROT
 	rkp_assign_mnt_flags(newmnt->mnt,mnt_flags);
 #else
-	newmnt->mnt.mnt_flags = mnt_flags;
+	newmnt->mnt_flags = mnt_flags;
 #endif
 	err = graft_tree(newmnt, parent, mp);
 
@@ -3309,7 +3339,7 @@ resume:
 #ifdef CONFIG_RKP_NS_PROT
 		if (!(mnt->mnt->mnt_flags & MNT_SHRINKABLE))
 #else
-		if (!(mnt->mnt.mnt_flags & MNT_SHRINKABLE))
+		if (!(mnt->mnt_flags & MNT_SHRINKABLE))
 #endif
 			continue;
 		/*
@@ -3869,7 +3899,7 @@ SYSCALL_DEFINE2(pivot_root, const char __user *, new_root,
 #ifdef CONFIG_RKP_NS_PROT
 	if (new_mnt->mnt->mnt_flags & MNT_LOCKED)
 #else
-	if (new_mnt->mnt.mnt_flags & MNT_LOCKED)
+	if (new_mnt->mnt_flags & MNT_LOCKED)
 #endif
 		goto out4;
 	error = -ENOENT;
@@ -3904,9 +3934,9 @@ SYSCALL_DEFINE2(pivot_root, const char __user *, new_root,
 		rkp_reset_mnt_flags(root_mnt->mnt,MNT_LOCKED);
 	}
 #else
-	if (root_mnt->mnt.mnt_flags & MNT_LOCKED) {
-		new_mnt->mnt.mnt_flags |= MNT_LOCKED;
-		root_mnt->mnt.mnt_flags &= ~MNT_LOCKED;
+	if (root_mnt->mnt_flags & MNT_LOCKED) {
+		new_mnt->mnt_flags |= MNT_LOCKED;
+		root_mnt->mnt_flags &= ~MNT_LOCKED;
 	}
 #endif
 	/* mount old root on put_old */
@@ -4146,7 +4176,7 @@ static bool mnt_already_visible(struct mnt_namespace *ns, struct vfsmount *new,
 			continue;
 
 		/* A local view of the mount flags */
-		mnt_flags = mnt->mnt.mnt_flags;
+		mnt_flags = mnt->mnt_flags;
 
 		/* Don't miss readonly hidden in the superblock flags */
 		if (sb_rdonly(mnt->mnt.mnt_sb))
