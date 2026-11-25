@@ -608,6 +608,13 @@ def switch_toolchain(compiler):
             run(git + ['checkout', compiler], check=True)
 
 def build(compiler, objtree='.'):
+    # Backport legacy SELinux fixes without changing the stable Manager UAPI.
+    patch = os.path.join(CK_DIR, 'cruel', 'ksun-legacy-selinux.patch')
+    git_apply = ['git', '-C', 'KernelSU-Next', 'apply']
+    if run(git_apply + ['--reverse', '--check', patch],
+           stdout=DEVNULL, stderr=DEVNULL).returncode != 0:
+        run(git_apply + [patch], check=True)
+
     env = {}
 
     toolchain[compiler]['CC'] = get_toolchain_cc(compiler)
