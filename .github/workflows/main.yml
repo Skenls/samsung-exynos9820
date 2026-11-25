@@ -102,6 +102,7 @@ jobs:
       - name: Check KernelSU Next in G970F kernel
         run: |
           grep -Fx 'CONFIG_KSU=y' .config
+          grep -Fx '#define KERNEL_SU_UAPI_VERSION 5' KernelSU-Next/uapi/supercall.h
           grep -Fx 'CONFIG_INITRAMFS_SOURCE=""' .config
           grep -Fx 'CONFIG_KSU_MANUAL_HOOK=y' .config
           grep -Fx '# CONFIG_KSU_DEBUG is not set' .config
@@ -110,8 +111,8 @@ jobs:
           grep -E ' [tT] kernelsu_init$' System.map
           grep -E ' [tT] ksu_handle_sys_reboot$' System.map
           grep -E ' [tT] ksu_ksud_init$' System.map
-          grep -aFq 'legacy-e5f5ec99' vmlinux
-          grep -aFq 'welcome to KernelSU version 33327' vmlinux
+          grep -aFq 'legacy-465490a2' vmlinux
+          grep -aFq 'welcome to KernelSU version 33314' vmlinux
           git diff --exit-code -- drivers/soc/samsung/cal-if/exynos9820/asv_exynos9820.h
 
       - name: Install mkbootimg

@@ -283,10 +283,10 @@ before configuring the kernel:
 git submodule update --init --depth 1 KernelSU-Next
 ```
 
-The built-in driver reports `legacy-e5f5ec99` (kernel version code `33327`).
-Use a Manager with UAPI 6 for module installation. The signed
-[upstream Manager build 33647](https://github.com/KernelSU-Next/KernelSU-Next/actions/runs/45550077232/artifacts/14994106096)
-includes a matching UAPI 6 daemon.
+The built-in driver reports `legacy-465490a2` (kernel version code `33314`).
+The driver uses UAPI 5. Use the
+[stable KernelSU Next v3.4.2 Manager](https://github.com/KernelSU-Next/KernelSU-Next/releases/tag/v3.4.2)
+with the matching UAPI 5 daemon.
 
 
 This instructions assumes you are using Linux. Install heimdall if you want to flash the

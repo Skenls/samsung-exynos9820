@@ -249,7 +249,7 @@ endif
 obj-$(CONFIG_SPU_VERIFY) += spu_verify/
 
 
-# KernelSU Next legacy e5f5ec99: 30000 + 3038 upstream commits + 289.
-export KSU_VERSION_OVERRIDE := 33327
-export KSU_VERSION_TAG_OVERRIDE := legacy-e5f5ec99
+# KernelSU Next legacy 465490a2: 30000 + 3025 upstream commits + 289.
+export KSU_VERSION_OVERRIDE := 33314
+export KSU_VERSION_TAG_OVERRIDE := legacy-465490a2
 obj-$(CONFIG_KSU) += kernelsu/
