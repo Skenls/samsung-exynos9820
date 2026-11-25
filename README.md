@@ -135,7 +135,6 @@ To alter the kernel configuration you need to edit lines:
         ./cruelbuild config                    \
                      model=${{ matrix.model }} \
                      name="Cruel-v5.3"         \
-                     +magisk                   \
                      +nohardening              \
                      +ttl                      \
                      +wireguard                \
@@ -159,9 +158,6 @@ the default current date is in cruel/build.mkbootimg.G973F file.
 Available configuration presets can be found in [configs](kernel/configs/) folder.
 Only the *.conf files prefixed with "cruel" are meaningful.
 Presets list (+ means enabled by default, use NODEFAULTS=1 env var to drop them):
-* +magisk - integrates magisk into the kernel. This allows to have root without
-  booting from recovery. Enabled by default. It's possible to specify magisk version,
-  e.g. +magisk=canary or +magisk=alpha or +magisk=v20.4 or +magisk=v19.4
 * dtb - build dtb/dtbo images
 * empty\_vbmeta - include empty vbmeta img in installer and flash it
 * always\_permit - pin SELinux to always use permissive mode. Required on LOS rom.
@@ -242,7 +238,6 @@ For example, you can alter default configuration to something like:
                      model=${{ matrix.model }} \
                      name="OwnKernel"          \
                      toolchain=proton          \
-                     +magisk=canary            \
                      +wireguard                \
                      +nohardening              \
                      +1000hz
@@ -331,7 +326,7 @@ $ git submodule update --init --depth 1 -j $(nproc)
 
 # Compile kernel for G970F, G973F, G975F phones.
 # Use model=all if you want to build the kernel for all available phones.
-$ ./cruelbuild mkimg name="CustomCruel" model=G970F,G973F,G975F toolchain=proton +magisk=canary +wireguard +ttl +cifs +nohardening
+$ ./cruelbuild mkimg name="CustomCruel" model=G970F,G973F,G975F toolchain=proton +wireguard +ttl +cifs +nohardening
 # You will find your kernel in boot.img file after compilation.
 $ ls -lah ./boot.img
 
@@ -340,7 +335,7 @@ $ ls -lah ./boot.img
 $ FLASH=y ./cruelbuild mkimg ...
 
 # Or in a single command (compilation with flashing)
-# FLASH=y ./cruelbuild mkimg name="CustomCruel" model=G973F toolchain=proton +magisk=canary +wireguard +ttl +cifs +nohardening
+# FLASH=y ./cruelbuild mkimg name="CustomCruel" model=G973F toolchain=proton +wireguard +ttl +cifs +nohardening
 ```
 
 ## Support

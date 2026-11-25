@@ -64,7 +64,6 @@ jobs:
                        model=${{ matrix.model }} \
                        name="Cruel-KRNL-fork"    \
                        toolchain=$TOOLCHAIN      \
-                       +magisk                   \
                        +io_maple                 \
                        +performance              \
                        +noksm                    \
