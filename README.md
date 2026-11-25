@@ -284,8 +284,9 @@ git submodule update --init --depth 1 KernelSU-Next
 ```
 
 The built-in driver reports `legacy-e5f5ec99` (kernel version code `33327`).
-The Manager app has its own release version. Keep SELinux enforcing when
-verifying root and module loading.
+Use a Manager with UAPI 6 for module installation. The signed
+[upstream Manager build 33647](https://github.com/KernelSU-Next/KernelSU-Next/actions/runs/45550077232/artifacts/14994106096)
+includes a matching UAPI 6 daemon.
 
 
 This instructions assumes you are using Linux. Install heimdall if you want to flash the
