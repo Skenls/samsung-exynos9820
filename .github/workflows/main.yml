@@ -106,7 +106,9 @@ jobs:
           grep -Fx 'CONFIG_INITRAMFS_SOURCE=""' .config
           grep -Fx 'CONFIG_KSU_MANUAL_HOOK=y' .config
           grep -Fx '# CONFIG_KSU_DEBUG is not set' .config
-          grep -Fx '# CONFIG_NET_SCH_FQ_CODEL is not set' .config
+          grep -Fx 'CONFIG_NET_SCH_FQ_CODEL=y' .config
+          grep -Fx '# CONFIG_NET_SCH_DEFAULT is not set' .config
+          grep -Fx 'CONFIG_DEFAULT_TCP_CONG="bic"' .config
           grep -Fx '# CONFIG_SCSI_UFS_CMD_LOGGING is not set' .config
           grep -E ' [tT] kernelsu_init$' System.map
           grep -E ' [tT] ksu_handle_sys_reboot$' System.map
