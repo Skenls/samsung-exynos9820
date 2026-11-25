@@ -590,18 +590,22 @@ def make_config(features, configs, model):
 def switch_toolchain(compiler):
     cc = os.path.abspath(get_toolchain_cc(compiler))
     if cc.startswith(os.path.realpath('toolchain')):
-        branch = run(['git', 'submodule', 'foreach', 'git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                     check=True, stdout=PIPE).stdout.decode('utf-8').splitlines()[1]
+        if not os.path.exists('toolchain/.git'):
+            fatal("Toolchain checkout is missing. Initialize toolchain first.")
+
+        git = ['git', '-C', 'toolchain']
+        branch = run(git + ['rev-parse', '--abbrev-ref', 'HEAD'],
+                     check=True, stdout=PIPE).stdout.decode('utf-8').strip()
         if not (tool_exists(cc) and compiler == branch):
-            ret = run(['git', 'submodule', 'foreach', 'git', 'rev-parse', '--verify', '--quiet', compiler],
+            ret = run(git + ['rev-parse', '--verify', '--quiet', compiler],
                       stdout=DEVNULL, stderr=DEVNULL)
             if ret.returncode != 0:
                 try:
-                    run(['git', 'submodule', 'foreach', 'git', 'branch', compiler, 'origin/' + compiler],
+                    run(git + ['branch', compiler, 'origin/' + compiler],
                         check=True, stdout=DEVNULL, stderr=DEVNULL)
                 except CalledProcessError:
                     fatal("Can't checkout to toolchain: " + compiler)
-            run(['git', 'submodule', 'foreach', 'git', 'checkout', compiler], check=True)
+            run(git + ['checkout', compiler], check=True)
 
 def build(compiler, objtree='.'):
     env = {}
