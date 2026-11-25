@@ -14,6 +14,7 @@
 #include <linux/namei.h>
 #include <linux/security.h>
 #include <linux/cred.h>
+#include <linux/sched.h>
 #include <linux/syscalls.h>
 #include <linux/pagemap.h>
 #include <linux/compat.h>
@@ -390,7 +391,8 @@ SYSCALL_DEFINE2(newfstat, unsigned int, fd, struct stat __user *, statbuf)
 	if (!error)
 		error = cp_new_stat(&stat, statbuf);
 #ifdef CONFIG_KSU_MANUAL_HOOK
-	if (!error)
+	/* Only Android init needs the adjusted size of init.rc. */
+	if (!error && unlikely(task_pid_nr(current) == 1))
 		ksu_handle_newfstat_ret(&fd, &statbuf);
 #endif
 
@@ -514,7 +516,7 @@ SYSCALL_DEFINE2(fstat64, unsigned long, fd, struct stat64 __user *, statbuf)
 	if (!error)
 		error = cp_new_stat64(&stat, statbuf);
 #ifdef CONFIG_KSU_MANUAL_HOOK
-	if (!error)
+	if (!error && unlikely(task_pid_nr(current) == 1))
 		ksu_handle_fstat64_ret(&fd, &statbuf);
 #endif
 
