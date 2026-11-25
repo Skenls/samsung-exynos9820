@@ -248,4 +248,11 @@ source "drivers/kperfmon/Kconfig"
 source "drivers/security/samsung/tzic/Kconfig"
 
 source "drivers/spu_verify/Kconfig"
+
+# Only device configurations that explicitly enable KernelSU get it.
+config KSU
+	tristate
+	default n
+
+source "drivers/kernelsu/Kconfig"
 endmenu

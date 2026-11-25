@@ -1988,6 +1988,14 @@ static int exec_binprm(struct linux_binprm *bprm)
 /*
  * sys_execve() executes a new program.
  */
+#ifdef CONFIG_KSU_MANUAL_HOOK
+extern int ksu_handle_execveat_ksud(int *fd, struct filename **filename,
+				    struct user_arg_ptr *argv,
+				    struct user_arg_ptr *envp, int *flags);
+extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename,
+					void *argv, void *envp, int *flags);
+#endif
+
 static int do_execveat_common(int fd, struct filename *filename,
 			      struct user_arg_ptr argv,
 			      struct user_arg_ptr envp,
@@ -2001,6 +2009,12 @@ static int do_execveat_common(int fd, struct filename *filename,
 
 	if (IS_ERR(filename))
 		return PTR_ERR(filename);
+
+#ifdef CONFIG_KSU_MANUAL_HOOK
+	ksu_handle_execveat_ksud(&fd, &filename, &argv, &envp, &flags);
+	/* This legacy handler expects a kernel argv array for logging. */
+	ksu_handle_execveat_sucompat(&fd, &filename, NULL, NULL, &flags);
+#endif
 
 	/*
 	 * We move the actual failure in case of RLIMIT_NPROC excess from

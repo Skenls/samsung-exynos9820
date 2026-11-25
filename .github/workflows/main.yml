@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - cruel-HVJ5-v5.3
+      - s10e-kernel-tuning
       - main
       - master
 
@@ -23,6 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Check out pinned KernelSU Next
+        run: git submodule update --init --depth 1 KernelSU-Next
       - uses: actions/setup-python@v4
         with:
           python-version: '3.7'
@@ -95,6 +98,21 @@ jobs:
 
       - name: Kernel Build
         run: ./cruelbuild :build
+
+      - name: Check KernelSU Next in G970F kernel
+        run: |
+          grep -Fx 'CONFIG_KSU=y' .config
+          grep -Fx 'CONFIG_INITRAMFS_SOURCE=""' .config
+          grep -Fx 'CONFIG_KSU_MANUAL_HOOK=y' .config
+          grep -Fx '# CONFIG_KSU_DEBUG is not set' .config
+          grep -Fx 'CONFIG_NET_SCH_FQ_CODEL=y' .config
+          grep -Fx '# CONFIG_SCSI_UFS_CMD_LOGGING is not set' .config
+          grep -E ' [tT] kernelsu_init$' System.map
+          grep -E ' [tT] ksu_handle_sys_reboot$' System.map
+          grep -E ' [tT] ksu_ksud_init$' System.map
+          grep -aFq 'legacy-e5f5ec99' vmlinux
+          grep -aFq 'welcome to KernelSU version 33327' vmlinux
+          git diff --exit-code -- drivers/soc/samsung/cal-if/exynos9820/asv_exynos9820.h
 
       - name: Install mkbootimg
         run: |

@@ -276,6 +276,18 @@ Available toolchains:
 
 ## How to build the kernel locally on your PC
 
+The G970F build uses the pinned KernelSU Next legacy submodule. Initialize it
+before configuring the kernel:
+
+```sh
+git submodule update --init --depth 1 KernelSU-Next
+```
+
+The built-in driver reports `legacy-e5f5ec99` (kernel version code `33327`).
+The Manager app has its own release version. Keep SELinux enforcing when
+verifying root and module loading.
+
+
 This instructions assumes you are using Linux. Install heimdall if you want to flash the
 kernel automatically.
 
