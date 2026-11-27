@@ -547,11 +547,15 @@ void DPU_EVENT_LOG_WINCON(struct v4l2_subdev *sd, struct decon_reg_data *regs)
 	int idx;
 	int win = 0;
 	bool window_updated = false;
-	ktime_t time = ktime_get();
+	ktime_t time;
 
-	if (IS_ERR_OR_NULL(decon->d.event_log))
+	/* Per-window snapshots are expensive on the normal frame path. */
+	if ((IS_ENABLED(CONFIG_SAMSUNG_PRODUCT_SHIP) &&
+	     READ_ONCE(decon_log_level) < 7) ||
+	    IS_ERR_OR_NULL(decon->d.event_log))
 		return;
 
+	time = ktime_get();
 	for (win = 0; win < decon->dt.max_win; win++) {
 		if (!(regs->win_regs[win].wincon & WIN_EN_F(win)))
 			continue;
