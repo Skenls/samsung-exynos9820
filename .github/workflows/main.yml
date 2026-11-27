@@ -125,9 +125,12 @@ jobs:
           sudo mv gki $(python -c 'import site; print(site.getsitepackages()[0])')
       - name: Install mkdtboimg
         run: |
-          wget -q https://android.googlesource.com/platform/system/libufdt/+archive/refs/heads/master.tar.gz -O - | tar --strip-components 2 -xzf - utils/src/mkdtboimg.py
-          chmod +x mkdtboimg.py
-          sudo mv mkdtboimg.py /usr/local/bin/mkdtboimg
+          curl --fail --silent --show-error --retry 4 --retry-all-errors \
+            --output "$RUNNER_TEMP/mkdtboimg.b64" \
+            'https://android.googlesource.com/platform/system/libufdt/+/refs/heads/main/utils/src/mkdtboimg.py?format=TEXT'
+          base64 --decode < "$RUNNER_TEMP/mkdtboimg.b64" > "$RUNNER_TEMP/mkdtboimg.py"
+          python3 "$RUNNER_TEMP/mkdtboimg.py" --help > /dev/null
+          sudo install -m 0755 "$RUNNER_TEMP/mkdtboimg.py" /usr/local/bin/mkdtboimg
       - name: Install avbtool
         run: |
           wget -q https://android.googlesource.com/platform/external/avb/+archive/refs/heads/master.tar.gz -O - | tar xzf - avbtool.py
